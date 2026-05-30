@@ -1,0 +1,25 @@
+from bs4 import BeautifulSoup
+import requests
+
+response = requests.get("https://example.com")
+soup = BeautifulSoup(response.text, "html.parser")
+
+# ── Tag Navigation ───────────────────────────────────────────────
+print(soup.title.text)                          # Page title
+print(soup.find("h1").text)                     # First H1 tag
+print(soup.find_all("a"))                       # All anchor links
+
+# ── CSS Selectors ────────────────────────────────────────────────
+items = soup.select("div.container > ul > li") # Nested CSS selector
+for item in items:
+    print(item.text.strip())
+
+# ── Attributes ───────────────────────────────────────────────────
+for link in soup.find_all("a", href=True):
+    print(link["href"])                         # Extract href values
+
+# ── Tables ───────────────────────────────────────────────────────
+import pandas as pd
+tables = pd.read_html("https://en.wikipedia.org/wiki/Python_(programming_language)")
+df = tables[0]                                  # Get the first table
+print(df.head())
