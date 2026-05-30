@@ -1,0 +1,27 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# Step 1: Send HTTP request to the target URL
+url = "https://books.toscrape.com/"
+headers = {"User-Agent": "Mozilla/5.0"}  # Mimic a real browser
+response = requests.get(url, headers=headers)
+
+# Step 2: Parse HTML content
+soup = BeautifulSoup(response.text, "html.parser")
+
+# Step 3: Extract relevant data
+books = []
+for book in soup.find_all("article", class_="product_pod"):
+    title = book.find("h3").find("a")["title"]           # Book title
+    price = book.find("p", class_="price_color").text    # Book price
+    rating = book.find("p", class_="star-rating")["class"][1]  # Rating
+    books.append({"Title": title, "Price": price, "Rating": rating})
+
+# Step 4: Store in a DataFrame
+df = pd.DataFrame(books)
+print(df.head())
+
+# Step 5: Save to CSV
+df.to_csv("books_dataset.csv", index=False)
+print("✅ Dataset saved successfully!")
