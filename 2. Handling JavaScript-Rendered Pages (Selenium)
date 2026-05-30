@@ -1,0 +1,31 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+import pandas as pd
+import time
+
+# Setup headless Chrome browser
+options = Options()
+options.add_argument("--headless")  # Run without opening a browser window
+driver = webdriver.Chrome(options=options)
+
+# Navigate to target page
+driver.get("https://quotes.toscrape.com/js/")
+time.sleep(3)  # Wait for JavaScript to load content
+
+# Extract data
+quotes_data = []
+quotes = driver.find_elements(By.CLASS_NAME, "quote")
+
+for quote in quotes:
+    text   = quote.find_element(By.CLASS_NAME, "text").text
+    author = quote.find_element(By.CLASS_NAME, "author").text
+    tags   = [tag.text for tag in quote.find_elements(By.CLASS_NAME, "tag")]
+    quotes_data.append({"Quote": text, "Author": author, "Tags": ", ".join(tags)})
+
+driver.quit()
+
+# Save to DataFrame & CSV
+df = pd.DataFrame(quotes_data)
+df.to_csv("quotes_dataset.csv", index=False)
+print("✅ JavaScript-rendered data scraped and saved!")
